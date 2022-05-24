@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { GraphQLClient, ClientContext } from 'graphql-hooks';
 import Proposals from './Proposals';
 import html2canvas from 'html2canvas';
@@ -8,20 +8,34 @@ const client = new GraphQLClient({
 });
 
 const App = () => {
-  useEffect(() => {
-    setTimeout(() => {
-      const screenshotTarget = document.body;
+  const [skip, setSkip] = useState(0);
 
-      html2canvas(screenshotTarget).then((canvas) => {
-        const date = new Date().toLocaleDateString();
-        const base64image = canvas.toDataURL('image/png');
-        const a = document.createElement('a');
-        a.setAttribute('href', base64image);
-        a.download = `jbx-snapshot-${date}.png`;
+  const screenshot = () => {
+    const screenshotTarget = document.body;
+    html2canvas(screenshotTarget).then((canvas) => {
+      const date = new Date().toLocaleDateString();
+      const base64image = canvas.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.setAttribute('href', base64image);
+      a.download = `jbx-snapshot-${date}.png`;
+      setTimeout(() => {
         a.click();
         a.remove();
-      });
-    }, 1000);
+      }, 1000);
+    });
+  };
+
+  const handleClick = () => {
+    setSkip(skip + 10);
+    screenshot();
+  };
+
+  useEffect(() => {
+    document.body.addEventListener('click', handleClick);
+    screenshot();
+    return () => {
+      document.body.removeEventListener('click', handleClick);
+    };
   }, []);
 
   return (
@@ -44,8 +58,13 @@ const App = () => {
           </div>
           <h1>JuiceboxDAO Open Proposals</h1>
         </header>
-        <Proposals />
+        <Proposals skip={skip} />
       </main>
+      <div className="button-wrapper">
+        <div className="view-more" onClick={handleClick}>
+          Click Anywhere to View More
+        </div>
+      </div>
     </ClientContext.Provider>
   );
 };

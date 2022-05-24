@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from 'graphql-hooks';
 
-const PROPSALS_QUERY = `query Proposals {
+const PROPSALS_QUERY = `query Proposals($skip: Int) {
   proposals (
-    first: 11,
-    skip: 0,
+    first: 10,
+    skip: $skip,
     where: {
       space_in: ["jbdao.eth"],
       state: "active"
@@ -22,9 +22,13 @@ const PROPSALS_QUERY = `query Proposals {
   }
 }`;
 
-const Proposals = () => {
-  const { loading, error, data } = useQuery(PROPSALS_QUERY);
+const Proposals = ({ skip }) => {
+  const { loading, error, data } = useQuery(PROPSALS_QUERY, {
+    variables: { skip: skip },
+  });
+
   if (loading) return 'loading...';
+
   if (error) return 'an error occured';
 
   return (
