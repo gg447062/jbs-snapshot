@@ -8,46 +8,33 @@ const client = new GraphQLClient({
 });
 
 const App = () => {
-  const [skip, setSkip] = useState(0);
+  const [loaded, setLoaded] = useState(false);
 
   const screenshot = () => {
     const screenshotTarget = document.body;
-    html2canvas(screenshotTarget).then((canvas) => {
+    html2canvas(screenshotTarget, { scale: 2 }).then((canvas) => {
       const date = new Date().toLocaleDateString();
       const base64image = canvas.toDataURL('image/png');
       const a = document.createElement('a');
       a.setAttribute('href', base64image);
       a.download = `jbx-snapshot-${date}.png`;
-      setTimeout(() => {
-        a.click();
-        a.remove();
-      }, 1000);
+      a.click();
+      a.remove();
     });
   };
 
-  const handleClick = () => {
-    setSkip(skip + 10);
-    screenshot();
-  };
-
   useEffect(() => {
-    document.body.addEventListener('click', handleClick);
-    screenshot();
-    return () => {
-      document.body.removeEventListener('click', handleClick);
-    };
-  }, []);
+    if (loaded) {
+      screenshot();
+    }
+  }, [loaded]);
 
   return (
     <ClientContext.Provider value={client}>
       <main>
         <header>
           <div>
-            <img
-              src="assets/fake_qr.png"
-              alt="qr code"
-              style={{ width: '10em' }}
-            />
+            <img src="assets/qr.png" alt="qr code" style={{ width: '10em' }} />
             <a href="https://snapshot.org/#/jbdao.eth" target={'_blank'}>
               <img
                 src="assets/jbx_logo_screenshot.png"
@@ -58,12 +45,10 @@ const App = () => {
           </div>
           <h1>JuiceboxDAO Open Proposals</h1>
         </header>
-        <Proposals skip={skip} />
+        <Proposals setLoaded={setLoaded} />
       </main>
       <div className="button-wrapper">
-        <div className="view-more" onClick={handleClick}>
-          Click Anywhere to View More
-        </div>
+        <div className="view-more">Click Anywhere to View More</div>
       </div>
     </ClientContext.Provider>
   );

@@ -47,6 +47,9 @@ h1 {
 .table-wrapper {
   flex: 1;
   overflow-y: scroll;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 table {
@@ -88,4 +91,11 @@ td {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.message {
+  padding: 0.5em;
+  border-top: 1px solid var(--yellow);
+  width: 100%;
+  text-align: center;
 }
